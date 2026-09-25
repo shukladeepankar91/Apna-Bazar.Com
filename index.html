@@ -3,34 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Shopping Site for Mobiles, Electronics, Furniture, Grocery & More</title>
+    <title>Apna-Bazar - Online Shopping Site</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Flipkart Style Header -->
+    <!-- Header -->
     <header class="navbar">
-        <div class="logo">FlipkartClone</div>
+        <div class="logo">Apna-Bazar</div>
         <div class="search-bar">
             <input type="text" placeholder="Search for products, brands and more">
         </div>
         <div class="nav-links">
-            <button class="login-btn">Login</button>
+            <button class="login-btn" onclick="toggleAdminPanel()">Admin Panel</button>
             <a href="#" class="cart-link">Cart (<span id="cart-count">0</span>)</a>
         </div>
     </header>
 
-    <!-- Main Banner Section -->
+    <!-- Admin Panel to Add Products -->
+    <div id="admin-panel" style="display:none; background: #fff; padding: 20px; margin: 20px 50px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <h3>Add New Product (Admin Rights)</h3>
+        <input type="text" id="p-title" placeholder="Product Name" style="padding: 8px; margin-right: 10px; width: 250px;">
+        <input type="text" id="p-price" placeholder="Price (e.g. ₹14,999)" style="padding: 8px; margin-right: 10px; width: 150px;">
+        <input type="text" id="p-img" placeholder="Image URL" style="padding: 8px; margin-right: 10px; width: 250px;">
+        <button onclick="addNewProduct()" style="background: #2874f0; color: white; border: none; padding: 9px 15px; cursor: pointer; font-weight: bold;">Add Product</button>
+    </div>
+
+    <!-- Banner -->
     <section class="banner">
-        <h2>Big Billion Days Coming Soon!</h2>
-        <p>Grab the best deals on Electronics, TVs, and more.</p>
+        <h2>Welcome to Apna-Bazar!</h2>
+        <p>Best Deals on Electronics, Televisions, and Daily Essentials.</p>
     </section>
 
     <!-- Products Section -->
     <main class="main-container">
-        <h3>Top Deals on Televisions & Electronics</h3>
-        <div class="product-grid" id="product-grid">
-            <!-- Products will be loaded dynamically via JavaScript -->
-        </div>
+        <h3>Featured Products</h3>
+        <div class="product-grid" id="product-grid"></div>
     </main>
 
     <script src="script.js"></script>
