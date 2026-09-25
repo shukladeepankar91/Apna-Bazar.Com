@@ -3,46 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apna-Bazar - Admin Portal</title>
+    <title>Apna-Bazar - Secure Admin Portal</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background-color: #f1f3f6; padding: 30px; }
-        .admin-box { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h2 { color: #2874f0; margin-bottom: 20px; }
-        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
-        button { background: #2874f0; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; }
-        button:hover { background: #1e5bc6; }
-        .back-link { display: block; margin-top: 15px; text-align: center; color: #2874f0; text-decoration: none; }
+        body { background-color: #f1f3f6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2, h3 { color: #2874f0; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #333; }
+        input[type="text"], input[type="file"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .btn { background: #2874f0; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        .btn:hover { background: #1e5bc6; }
+        
+        /* Login Box */
+        #login-section { max-width: 400px; margin: 100px auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        
+        /* Product Table */
+        table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 14px; }
+        th { background: #2874f0; color: white; }
+        img { width: 50px; height: 50px; object-fit: contain; }
+        .action-btns button { padding: 5px 10px; margin: 2px; cursor: pointer; border: none; border-radius: 3px; font-weight: bold; }
+        .btn-stock { background: #ff9f00; color: white; }
+        .btn-delete { background: #ff4d4d; color: white; }
+        .back-link { display: inline-block; margin-top: 20px; color: #2874f0; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <div class="admin-box">
-        <h2>Admin Product Manager</h2>
-        <input type="text" id="p-title" placeholder="Product Name">
-        <input type="text" id="p-price" placeholder="Price (e.g. ₹14,999)">
-        <input type="text" id="p-img" placeholder="Image Direct URL">
-        <button onclick="addNewProduct()">Publish Product to Store</button>
+    <!-- Login Section -->
+    <div id="login-section">
+        <h2>Admin Login</h2>
+        <div class="form-group" style="text-align: left;">
+            <label>Password (default: admin123)</label>
+            <input type="password" id="admin-pass" placeholder="Enter password">
+        </div>
+        <button class="btn" onclick="checkLogin()">Login</button>
+    </div>
+
+    <!-- Admin Dashboard (Hidden by default) -->
+    <div id="admin-dashboard" class="container" style="display: none;">
+        <h2>Admin Dashboard - Manage Products</h2>
+        
+        <div class="form-group">
+            <label>Product Name</label>
+            <input type="text" id="p-title" placeholder="e.g. Samsung Smart TV">
+        </div>
+        <div class="form-group">
+            <label>Price</label>
+            <input type="text" id="p-price" placeholder="e.g. ₹24,999">
+        </div>
+        <div class="form-group">
+            <label>Upload Product Photo (from device)</label>
+            <input type="file" id="p-img" accept="image/*">
+        </div>
+        <button class="btn" onclick="addNewProduct()">Add Product to Store</button>
+
+        <h3 style="margin-top: 30px;">Available Products List</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="product-table-body">
+                <!-- Products will load here -->
+            </tbody>
+        </table>
+
         <a href="index.html" class="back-link">← Go back to Live Store</a>
     </div>
 
     <script>
-        function addNewProduct() {
+        // Simple Login Check
+        function checkLogin() {
+            const pass = document.getElementById("admin-pass").value;
+            if(pass === "admin123") {
+                document.getElementById("login-section").style.display = "none";
+                document.getElementById("admin-dashboard").style.display = "block";
+                loadAdminProducts();
+            } else {
+                alert("Galat password hai bhai!");
+            }
+        }
+
+        // Load Products in Admin Table
+        function loadAdminProducts() {
             let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [];
+            const tbody = document.getElementById("product-table-body");
             
+            if(products.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5">Koi product nahi hai!</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = products.map((p, index) => `
+                <tr>
+                    <td><img src="${p.img}" alt=""></td>
+                    <td>${p.title}</td>
+                    <td>${p.price}</td>
+                    <td style="font-weight: bold; color: ${p.status === 'Out of Stock' ? 'red' : 'green'};">${p.status || 'In Stock'}</td>
+                    <td class="action-btns">
+                        <button class="btn-stock" onclick="toggleStock(${index})">${p.status === 'Out of Stock' ? 'Make In Stock' : 'Out of Stock'}</button>
+                        <button class="btn-delete" onclick="deleteProduct(${index})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Add New Product with Direct Image File Upload (Converted to Base64)
+        function addNewProduct() {
             const title = document.getElementById("p-title").value;
             const price = document.getElementById("p-price").value;
-            const img = document.getElementById("p-img").value;
+            const imageInput = document.getElementById("p-img");
 
-            if(title && price && img) {
-                products.push({ title, price, img });
-                localStorage.setItem('apna_bazar_products', JSON.stringify(products));
-                alert("Product successfully live ho gaya store par!");
-                document.getElementById("p-title").value = "";
-                document.getElementById("p-price").value = "";
-                document.getElementById("p-img").value = "";
+            if(title && price && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.readAsDataURL(imageInput.files[0]);
+                reader.onload = function () {
+                    let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [];
+                    products.push({ 
+                        title: title, 
+                        price: price, 
+                        img: reader.result, 
+                        status: "In Stock" 
+                    });
+                    localStorage.setItem('apna_bazar_products', JSON.stringify(products));
+                    loadAdminProducts();
+                    alert("Product successfully add ho gaya!");
+                    document.getElementById("p-title").value = "";
+                    document.getElementById("p-price").value = "";
+                    imageInput.value = "";
+                };
             } else {
-                alert("Kripya sabhi fields sahi se bharein!");
+                alert("Kripya saari details bharein aur photo select karein!");
+            }
+        }
+
+        // Toggle Out of Stock / In Stock
+        function toggleStock(index) {
+            let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [];
+            products[index].status = products[index].status === 'Out of Stock' ? 'In Stock' : 'Out of Stock';
+            localStorage.setItem('apna_bazar_products', JSON.stringify(products));
+            loadAdminProducts();
+        }
+
+        // Delete Product
+        function deleteProduct(index) {
+            let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [];
+            if(confirm("Kya aap sach me is product ko delete karna chahte hain?")) {
+                products.splice(index, 1);
+                localStorage.setItem('apna_bazar_products', JSON.stringify(products));
+                loadAdminProducts();
             }
         }
     </script>
