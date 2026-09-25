@@ -8,70 +8,310 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background-color: #f1f3f6; }
         .navbar { background-color: #2874f0; display: flex; align-items: center; justify-content: space-between; padding: 10px 50px; color: white; }
-        .logo { font-size: 20px; font-weight: bold; font-style: italic; }
+        .logo { font-size: 20px; font-weight: bold; font-style: italic; cursor: pointer; }
         .search-bar input { width: 400px; padding: 10px; border: none; border-radius: 2px; outline: none; }
-        .cart-link { color: white; text-decoration: none; font-weight: bold; }
+        .nav-btn { background: white; color: #2874f0; border: none; padding: 6px 20px; font-weight: bold; cursor: pointer; border-radius: 2px; }
+        .cart-link { color: white; text-decoration: none; font-weight: bold; cursor: pointer; }
+        
         .banner { background: linear-gradient(to right, #2874f0, #1e5bc6); color: white; text-align: center; padding: 30px; margin: 15px 50px; border-radius: 4px; }
         .main-container { padding: 0 50px 30px 50px; }
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
-        .product-card { background: white; padding: 15px; text-align: center; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; }
+        .product-card { background: white; padding: 15px; text-align: center; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); position: relative; cursor: pointer; }
         .product-card img { height: 140px; object-fit: contain; margin-bottom: 10px; width: 100%; }
-        .out-of-stock-badge { position: absolute; top: 10px; right: 10px; background: red; color: white; padding: 3px 8px; font-size: 11px; font-weight: bold; border-radius: 3px; }
+        
+        /* Views */
+        .page-section { display: none; padding: 20px 50px; background: white; margin: 20px 50px; border-radius: 4px; }
+        
+        /* Product Details View with Zoom */
+        #detail-view { display: none; padding: 30px 50px; background: white; margin: 20px 50px; border-radius: 4px; }
+        .product-detail-container { display: flex; gap: 40px; }
+        .img-zoom-container { position: relative; width: 400px; height: 400px; overflow: hidden; border: 1px solid #ddd; }
+        .img-zoom-container img { width: 100%; height: 100%; object-fit: contain; transition: transform 0.3s ease; }
+        .img-zoom-container:hover img { transform: scale(1.8); cursor: zoom-in; }
+        
+        /* Reviews Section */
+        .reviews-section { margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; }
+        .review-card { background: #f9f9f9; padding: 10px; margin-bottom: 10px; border-radius: 4px; font-size: 14px; }
+        
+        /* Modals */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 8px; width: 400px; text-align: center; position: relative; }
+        .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 20px; cursor: pointer; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
     </style>
 </head>
 <body>
 
+    <!-- Navbar -->
     <header class="navbar">
-        <div class="logo">Apna-Bazar</div>
+        <div class="logo" onclick="showHome()">Apna-Bazar</div>
         <div class="search-bar">
             <input type="text" placeholder="Search for products, brands and more">
         </div>
         <div class="nav-links">
-            <a href="#" class="cart-link">Cart (<span id="cart-count">0</span>)</a>
+            <button class="nav-btn" id="login-nav-btn" onclick="openLoginModal()">Login</button>
+            <span id="user-display" style="margin-right: 15px; font-weight: bold; display: none;"></span>
+            <a class="cart-link" onclick="openCart()">Cart (<span id="cart-count">0</span>)</a>
         </div>
     </header>
 
-    <section class="banner">
-        <h2>Welcome to Apna-Bazar!</h2>
-        <p>Best Deals on Electronics, Televisions, and More.</p>
-    </section>
+    <!-- Home View -->
+    <div id="home-view">
+        <section class="banner">
+            <h2>Welcome to Apna-Bazar!</h2>
+            <p>Best Deals on Electronics, Televisions, and More.</p>
+        </section>
+        <main class="main-container">
+            <h3>Featured Products</h3>
+            <div class="product-grid" id="product-grid"></div>
+        </main>
+    </div>
 
-    <main class="main-container">
-        <h3>Featured Products</h3>
-        <div class="product-grid" id="product-grid"></div>
-    </main>
+    <!-- Product Detail & Zoom View -->
+    <div id="detail-view">
+        <button onclick="showHome()" style="margin-bottom: 20px; padding: 6px 12px; cursor: pointer;">← Back to Products</button>
+        <div class="product-detail-container">
+            <div class="img-zoom-container">
+                <img id="detail-img" src="" alt="Product Image">
+            </div>
+            <div>
+                <h2 id="detail-title" style="margin-bottom: 10px;"></h2>
+                <h3 id="detail-price" style="color: #388e3c; margin-bottom: 20px;"></h3>
+                <p style="color: #666; margin-bottom: 20px;">100% Original product with manufacturer warranty. Free Delivery & Easy Returns available.</p>
+                <button class="nav-btn" style="background: #ff9f00; color: white; padding: 12px 25px;" onclick="addCurrentToCart()">Add to Cart</button>
+                
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h4>Customer Reviews</h4>
+                    <div id="reviews-list" style="margin-top: 10px;"></div>
+                    <div style="margin-top: 15px;">
+                        <input type="text" id="review-input" placeholder="Write a review..." style="width: 70%; padding: 8px;">
+                        <button onclick="submitReview()" style="padding: 8px 15px; background: #2874f0; color: white; border: none; cursor: pointer;">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart View -->
+    <div id="cart-view" class="page-section">
+        <h2>Your Shopping Cart</h2>
+        <div id="cart-items-container"></div>
+        <div style="margin-top: 20px; text-align: right;">
+            <h3>Total Amount: <span id="cart-total">₹0</span></h3>
+            <button class="nav-btn" style="background: #ff9f00; color: white; padding: 10px 20px; margin-top: 10px;" onclick="openCheckout()">Proceed to Buy</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeLoginModal()">&times;</span>
+            <h2>Register / Login</h2>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Enter your phone number to continue</p>
+            <input type="text" id="phone-input" placeholder="Enter Phone Number">
+            <button class="nav-btn" style="width: 100%; background: #2874f0; color: white; padding: 10px;" onclick="handleLogin()">Continue</button>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="modal">
+        <div class="modal-content" style="text-align: left;">
+            <span class="close-btn" onclick="closeCheckout()">&times;</span>
+            <h2>Checkout Details</h2>
+            <label>Delivery Address</label>
+            <input type="text" id="address-input" placeholder="Enter full address">
+            
+            <label>Payment Method</label>
+            <select id="payment-method" style="width:100%; padding:10px; margin:10px 0;">
+                <option value="UPI">UPI / Google Pay / PhonePe</option>
+                <option value="COD">Cash on Delivery (COD)</option>
+            </select>
+            
+            <button class="nav-btn" style="width: 100%; background: #388e3c; color: white; padding: 12px; margin-top: 15px;" onclick="placeOrder()">Place Order</button>
+        </div>
+    </div>
 
     <script>
         let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [
-            { title: "Foxsky 43 inch Full HD Smart TV", price: "₹13,699", img: "https://rukminim2.flixcart.com/image/312/312/xif0q/television/t/6/1/-original-imahhxggzchbd72z.jpeg?q=70", status: "In Stock" },
-            { title: "Foxsky 55 inch 4K Ultra HD Mini LED", price: "₹37,499", img: "https://rukminim2.flixcart.com/image/312/312/xif0q/television/q/z/e/-original-imahpfryfv8jbzpa.jpeg?q=70", status: "In Stock" }
+            { id: 1, title: "Foxsky 43 inch Full HD Smart TV", price: "13699", img: "https://rukminim2.flixcart.com/image/312/312/xif0q/television/t/6/1/-original-imahhxggzchbd72z.jpeg?q=70", status: "In Stock", reviews: ["Great picture quality!", "Value for money."] },
+            { id: 2, title: "Foxsky 55 inch 4K Ultra HD Mini LED", price: "37499", img: "https://rukminim2.flixcart.com/image/312/312/xif0q/television/q/z/e/-original-imahpfryfv8jbzpa.jpeg?q=70", status: "In Stock", reviews: ["Awesome display."] }
         ];
 
-        let cartCount = 0;
+        let cart = JSON.parse(localStorage.getItem('apna_bazar_cart')) || [];
+        let currentUser = localStorage.getItem('apna_bazar_user') || null;
+        let selectedProductIndex = null;
+
+        function checkUserAuth() {
+            if(currentUser) {
+                document.getElementById("login-nav-btn").style.display = "none";
+                let userDisplay = document.getElementById("user-display");
+                userDisplay.style.display = "inline";
+                userDisplay.innerText = "👤 " + currentUser;
+            }
+            updateCartCount();
+        }
 
         function displayProducts() {
             const grid = document.getElementById("product-grid");
-            grid.innerHTML = products.map(p => `
-                <div class="product-card">
-                    ${p.status === 'Out of Stock' ? '<div class="out-of-stock-badge">OUT OF STOCK</div>' : ''}
+            grid.innerHTML = products.map((p, index) => `
+                <div class="product-card" onclick="openProductDetail(${index})">
+                    ${p.status === 'Out of Stock' ? '<div style="position:absolute;top:10px;right:10px;background:red;color:white;padding:3px 6px;font-size:10px;font-weight:bold;">OUT OF STOCK</div>' : ''}
                     <img src="${p.img}" alt="${p.title}" style="opacity: ${p.status === 'Out of Stock' ? '0.4' : '1'};">
-                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px; color: #212121;">${p.title}</div>
-                    <div style="color: #388e3c; font-weight: bold; font-size: 16px; margin-bottom: 10px;">${p.price}</div>
-                    <button onclick="${p.status === 'Out of Stock' ? 'alert(\'This product is currently out of stock!\')' : 'addToCart()'}" 
-                        style="background: ${p.status === 'Out of Stock' ? '#ccc' : '#ff9f00'}; color: white; border: none; padding: 8px; width: 100%; cursor: ${p.status === 'Out of Stock' ? 'not-allowed' : 'pointer'}; font-weight: bold; border-radius: 2px;">
+                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 8px;">${p.title}</div>
+                    <div style="color: #388e3c; font-weight: bold; font-size: 16px; margin-bottom: 10px;">₹${p.price}</div>
+                    <button onclick="event.stopPropagation(); ${p.status === 'Out of Stock' ? 'alert(\'Product unavailable!\')' : `addToCart(${index})`}" 
+                        style="background: ${p.status === 'Out of Stock' ? '#ccc' : '#ff9f00'}; color: white; border: none; padding: 8px; width: 100%; cursor: pointer; font-weight: bold; border-radius: 2px;">
                         ${p.status === 'Out of Stock' ? 'Unavailable' : 'Add to Cart'}
                     </button>
                 </div>
             `).join('');
         }
 
-        function addToCart() {
-            cartCount++;
-            document.getElementById("cart-count").innerText = cartCount;
-            alert("Item cart mein add ho gaya hai!");
+        // Product Detail & Zoom View
+        function openProductDetail(index) {
+            selectedProductIndex = index;
+            const p = products[index];
+            document.getElementById("home-view").style.display = "none";
+            document.getElementById("cart-view").style.display = "none";
+            document.getElementById("detail-view").style.display = "block";
+
+            document.getElementById("detail-img").src = p.img;
+            document.getElementById("detail-title").innerText = p.title;
+            document.getElementById("detail-price").innerText = "₹" + p.price;
+            loadReviews(index);
         }
 
-        window.onload = displayProducts;
+        function loadReviews(index) {
+            const list = document.getElementById("reviews-list");
+            const p = products[index];
+            if(!p.reviews || p.reviews.length === 0) {
+                list.innerHTML = "<p style='color:#777; font-size:13px;'>No reviews yet. Be the first to review!</p>";
+                return;
+            }
+            list.innerHTML = p.reviews.map(r => `<div class="review-card">⭐ ${r}</div>`).join('');
+        }
+
+        function submitReview() {
+            const text = document.getElementById("review-input").value;
+            if(text && selectedProductIndex !== null) {
+                if(!products[selectedProductIndex].reviews) products[selectedProductIndex].reviews = [];
+                products[selectedProductIndex].reviews.push(text);
+                localStorage.setItem('apna_bazar_products', JSON.stringify(products));
+                loadReviews(selectedProductIndex);
+                document.getElementById("review-input").value = "";
+                alert("Review submitted!");
+            }
+        }
+
+        function addCurrentToCart() {
+            if(selectedProductIndex !== null) {
+                addToCart(selectedProductIndex);
+            }
+        }
+
+        // Auth Functions
+        function openLoginModal() { document.getElementById("login-modal").style.display = "flex"; }
+        function closeLoginModal() { document.getElementById("login-modal").style.display = "none"; }
+        function handleLogin() {
+            const phone = document.getElementById("phone-input").value;
+            if(phone.length >= 10) {
+                localStorage.setItem('apna_bazar_user', phone);
+                currentUser = phone;
+                checkUserAuth();
+                closeLoginModal();
+                alert("Login successful!");
+            } else {
+                alert("Please enter a valid phone number.");
+            }
+        }
+
+        // Cart Functions
+        function addToCart(index) {
+            cart.push(products[index]);
+            localStorage.setItem('apna_bazar_cart', JSON.stringify(cart));
+            updateCartCount();
+            alert("Product added to cart!");
+        }
+
+        function updateCartCount() { document.getElementById("cart-count").innerText = cart.length; }
+        
+        function openCart() {
+            document.getElementById("home-view").style.display = "none";
+            document.getElementById("detail-view").style.display = "none";
+            document.getElementById("cart-view").style.display = "block";
+            loadCartItems();
+        }
+
+        function showHome() {
+            document.getElementById("home-view").style.display = "block";
+            document.getElementById("detail-view").style.display = "none";
+            document.getElementById("cart-view").style.display = "none";
+            displayProducts();
+        }
+
+        function loadCartItems() {
+            const container = document.getElementById("cart-items-container");
+            let total = 0;
+            if(cart.length === 0) {
+                container.innerHTML = "<p>Your cart is empty.</p>";
+                document.getElementById("cart-total").innerText = "₹0";
+                return;
+            }
+            container.innerHTML = cart.map((item, i) => {
+                total += Number(item.price);
+                return `
+                    <div class="cart-item">
+                        <div><b>${item.title}</b></div>
+                        <div>₹${item.price} <button onclick="removeFromCart(${i})" style="margin-left:15px; color:red; border:none; background:none; cursor:pointer; font-weight:bold;">Remove</button></div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById("cart-total").innerText = "₹" + total;
+        }
+
+        function removeFromCart(i) {
+            cart.splice(i, 1);
+            localStorage.setItem('apna_bazar_cart', JSON.stringify(cart));
+            loadCartItems();
+            updateCartCount();
+        }
+
+        function openCheckout() {
+            if(!currentUser) {
+                alert("Please login first!");
+                openLoginModal();
+                return;
+            }
+            if(cart.length === 0) {
+                alert("Cart is empty!");
+                return;
+            }
+            document.getElementById("checkout-modal").style.display = "flex";
+        }
+
+        function closeCheckout() { document.getElementById("checkout-modal").style.display = "none"; }
+
+        function placeOrder() {
+            const address = document.getElementById("address-input").value;
+            const payment = document.getElementById("payment-method").value;
+            if(address) {
+                alert(`Order placed successfully via ${payment}!\nDelivery Address: ${address}`);
+                cart = [];
+                localStorage.removeItem('apna_bazar_cart');
+                updateCartCount();
+                closeCheckout();
+                showHome();
+            } else {
+                alert("Please enter address.");
+            }
+        }
+
+        window.onload = function() {
+            checkUserAuth();
+            displayProducts();
+        };
     </script>
 </body>
 </html>
