@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apna-Bazar - Admin Portal</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f1f3f6; padding: 30px; }
+        .admin-box { max-width: 500px; margin: auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2 { color: #2874f0; margin-bottom: 20px; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #2874f0; color: white; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #1e5bc6; }
+        .back-link { display: block; margin-top: 15px; text-align: center; color: #2874f0; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-box">
+        <h2>Admin Product Manager</h2>
+        <input type="text" id="p-title" placeholder="Product Name">
+        <input type="text" id="p-price" placeholder="Price (e.g. ₹14,999)">
+        <input type="text" id="p-img" placeholder="Image Direct URL">
+        <button onclick="addNewProduct()">Publish Product to Store</button>
+        <a href="index.html" class="back-link">← Go back to Live Store</a>
+    </div>
+
+    <script>
+        function addNewProduct() {
+            let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [];
+            
+            const title = document.getElementById("p-title").value;
+            const price = document.getElementById("p-price").value;
+            const img = document.getElementById("p-img").value;
+
+            if(title && price && img) {
+                products.push({ title, price, img });
+                localStorage.setItem('apna_bazar_products', JSON.stringify(products));
+                alert("Product successfully live ho gaya store par!");
+                document.getElementById("p-title").value = "";
+                document.getElementById("p-price").value = "";
+                document.getElementById("p-img").value = "";
+            } else {
+                alert("Kripya sabhi fields sahi se bharein!");
+            }
+        }
+    </script>
+</body>
+</html>

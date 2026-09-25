@@ -5,118 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Apna-Bazar - Online Shopping Site</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
-        body {
-            background-color: #f1f3f6;
-        }
-        .navbar {
-            background-color: #2874f0;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 50px;
-            color: white;
-        }
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            font-style: italic;
-        }
-        .search-bar input {
-            width: 400px;
-            padding: 10px;
-            border: none;
-            border-radius: 2px;
-            outline: none;
-        }
-        .admin-btn {
-            background: white;
-            color: #2874f0;
-            border: none;
-            padding: 6px 20px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 2px;
-        }
-        .cart-link {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            margin-left: 20px;
-        }
-        .banner {
-            background: linear-gradient(to right, #2874f0, #1e5bc6);
-            color: white;
-            text-align: center;
-            padding: 30px;
-            margin: 15px 50px;
-            border-radius: 4px;
-        }
-        .main-container {
-            padding: 0 50px 30px 50px;
-        }
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 15px;
-        }
-        .product-card {
-            background: white;
-            padding: 15px;
-            text-align: center;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .product-card img {
-            height: 140px;
-            object-fit: contain;
-            margin-bottom: 10px;
-            width: 100%;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background-color: #f1f3f6; }
+        .navbar { background-color: #2874f0; display: flex; align-items: center; justify-content: space-between; padding: 10px 50px; color: white; }
+        .logo { font-size: 20px; font-weight: bold; font-style: italic; }
+        .search-bar input { width: 400px; padding: 10px; border: none; border-radius: 2px; outline: none; }
+        .cart-link { color: white; text-decoration: none; font-weight: bold; }
+        .banner { background: linear-gradient(to right, #2874f0, #1e5bc6); color: white; text-align: center; padding: 30px; margin: 15px 50px; border-radius: 4px; }
+        .main-container { padding: 0 50px 30px 50px; }
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; }
+        .product-card { background: white; padding: 15px; text-align: center; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .product-card img { height: 140px; object-fit: contain; margin-bottom: 10px; width: 100%; }
     </style>
 </head>
 <body>
 
-    <!-- Navbar -->
     <header class="navbar">
         <div class="logo">Apna-Bazar</div>
         <div class="search-bar">
             <input type="text" placeholder="Search for products, brands and more">
         </div>
         <div class="nav-links">
-            <button class="admin-btn" onclick="toggleAdminPanel()">Admin Panel</button>
             <a href="#" class="cart-link">Cart (<span id="cart-count">0</span>)</a>
         </div>
     </header>
 
-    <!-- Admin Panel Box -->
-    <div id="admin-panel" style="display:none; background: #fff; padding: 20px; margin: 15px 50px; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-        <h3>Add New Product (Admin Panel)</h3><br>
-        <input type="text" id="p-title" placeholder="Product Name" style="padding: 8px; margin-right: 10px; width: 280px; margin-bottom: 10px;"><br>
-        <input type="text" id="p-price" placeholder="Price (e.g. ₹14,999)" style="padding: 8px; margin-right: 10px; width: 280px; margin-bottom: 10px;"><br>
-        <input type="text" id="p-img" placeholder="Image Direct URL" style="padding: 8px; margin-right: 10px; width: 280px; margin-bottom: 10px;"><br>
-        <button onclick="addNewProduct()" style="background: #2874f0; color: white; border: none; padding: 9px 20px; cursor: pointer; font-weight: bold; border-radius: 2px;">Save Product</button>
-    </div>
-
-    <!-- Banner -->
     <section class="banner">
         <h2>Welcome to Apna-Bazar!</h2>
         <p>Best Deals on Electronics, Televisions, and More.</p>
     </section>
 
-    <!-- Products Section -->
     <main class="main-container">
         <h3>Featured Products</h3>
         <div class="product-grid" id="product-grid"></div>
     </main>
 
     <script>
-        // Products data stored locally
         let products = JSON.parse(localStorage.getItem('apna_bazar_products')) || [
             { title: "Foxsky 43 inch Full HD Smart TV", price: "₹13,699", img: "https://rukminim2.flixcart.com/image/312/312/xif0q/television/t/6/1/-original-imahhxggzchbd72z.jpeg?q=70" },
             { title: "Foxsky 55 inch 4K Ultra HD Mini LED", price: "₹37,499", img: "https://rukminim2.flixcart.com/image/312/312/xif0q/television/q/z/e/-original-imahpfryfv8jbzpa.jpeg?q=70" },
@@ -135,34 +59,6 @@
                     <button onclick="addToCart()" style="background: #ff9f00; color: white; border: none; padding: 8px; width: 100%; cursor: pointer; font-weight: bold; border-radius: 2px;">Add to Cart</button>
                 </div>
             `).join('');
-        }
-
-        function toggleAdminPanel() {
-            const panel = document.getElementById("admin-panel");
-            if (panel.style.display === "none" || panel.style.display === "") {
-                panel.style.display = "block";
-            } else {
-                panel.style.display = "none";
-            }
-        }
-
-        function addNewProduct() {
-            const title = document.getElementById("p-title").value;
-            const price = document.getElementById("p-price").value;
-            const img = document.getElementById("p-img").value;
-
-            if(title && price && img) {
-                products.push({ title, price, img });
-                localStorage.setItem('apna_bazar_products', JSON.stringify(products));
-                displayProducts();
-                alert("Product successfully add ho gaya hai!");
-                document.getElementById("p-title").value = "";
-                document.getElementById("p-price").value = "";
-                document.getElementById("p-img").value = "";
-                toggleAdminPanel();
-            } else {
-                alert("Kripya sabhi fields bharein!");
-            }
         }
 
         function addToCart() {
