@@ -6,6 +6,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Root Test Route (Server status check karne ke liye)
+app.get('/', (req, res) => {
+    res.send('Apna Bazar WhatsApp OTP Backend is Live! 🚀');
+});
+
 // Meta Credentials
 const TOKEN = 'EAA7tc4gMFJIBSi3APpHfgQgincQF7oKffsCfX3U3dsoWZB3YfOeWoPyoODZA9MxNVIQZCgoLLOjqqsdh1e0jYSQTiUZCdUKMsBv2WUlNJaK4oXAjUxRO1mnG6cVn0dyx29hSLLHqizZCOOTa2QkD2Xb8EJkIh3lslNrV2cBZASqLba6kcQZBZAb4bkWwn4Q9fy6icS7ZBvs9ncFXlMqTgEmv2mjDGNWDZAZAmrZAIw6NuwFQF2SUFj8Joe0Yv4jASXR225rvuS2wdjaZA3wbUBa4yUNi0';
 const PHONE_NUMBER_ID = '1378392788687666';
